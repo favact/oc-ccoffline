@@ -1,0 +1,149 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title"><i class="fa fa-shopping-cart"></i> {{ heading_title }}</h3>
+  </div>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <td class="text-right">{{ column_order_id }}</td>
+          <td>{{ column_customer }}</td>
+
+		  <td>{{ column_orderdetails }}</td>
+			
+          <td>{{ column_status }}</td>
+          <td>{{ column_date_added }}</td>
+          <td class="text-right">{{ column_total }}</td>
+          <td class="text-right">{{ column_action }}</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% if orders %}
+        {% for order in orders %}
+        <tr>
+          <td class="text-right">{{ order.order_id }}</td>
+          <td>{{ order.customer }}</td>
+
+    <td class="text-left">
+     <span class="previeworder" data-toggle="popover" data-placement="top" data-trigger="hover" data-html="true" title="<center>{{ text_viewing }} <b>{{ order.products|length }}</b>
+        {% if order.products|length > 1 %}{{ text_products_order }}{% else %}{{ text_product_order }}{% endif %} #{{ order.order_id }}</center>" data-content="
+		<div class='table-responsive'>
+		  <table class='table table-responsive table-bordered'>
+            <tr>
+			  <td class='text-center'><b>{{ column_image }}</b></td>
+              <td class='text-left'><b>{{ column_product }}</b></td>
+              <td class='text-left'><b>{{ column_model }}</b></td>
+              <td class='text-right'><b>{{ column_quantity }}</b></td>  
+            </tr>         
+           {% set int=0 %}
+           {% set countit=1 %}
+           {% for product in order.products %}
+            <tr>
+              <td class='text-center'><img src='{{ product.image }}'></td>
+              <td class='text-left' style='font-weight:normal;font-size:12px;'> <span style='color: #1e91cf;'><span style='font-size:14px;'>{{ countit }}.</span> <b>{{ product.name }}</b></span>
+                {% for option in product.option %}
+                <br>
+                {% if option.type != 'file' %}
+                &nbsp;<span style='font-size:12px;'> - {{ option.name }}: {{ option.value }}</span>
+                {% else %}
+                &nbsp;<span style='font-size:12px;'> - {{ option.name }}: <a href='{{ option.href }}'>{{ option.value }}</a></span>
+                {% endif %}
+                {% endfor %}
+              </td>
+              <td class='text-left' style='font-weight:normal;font-size:12px;'>{{ product.model }}</td>
+              <td class='text-right'><span style='color: #1e91cf;font-weight:normal;'> {{ product.quantity }} {% set int = int + product.quantity %}</span></td>
+            </tr>
+            {% set countit = countit + 1 %}
+            {% endfor %}
+            <tr>
+              <td class='text-left' style='font-size:12px;'><b style='color: #39b3d7;'>{{ text_payment_method }}</b></td>
+              <td></td>
+              <td></td>
+              <td class='text-right'><b style='color: #39b3d7;font-size:12px;'>{{ text_total }}</b></td>
+            </tr>
+            <tr>
+              <td class='text-left' style='font-size:12px;'>{{ order.payment }}</td>
+              <td></td>
+              <td></td>
+              <td class='text-right' style='font-size:12px;'>{{ int }}</td>
+            </tr>
+		  </table>
+		</div>
+     ">
+        <span style="color: #39b3d7;"><i class="fa fa-eye fa-lg"></i> <b>{{ order.products|length }}</b> {{ text_no_product }}{% if order.products|length >1 %}{{ text_no_products }} - 
+	    {% set int=0 %}
+	    {% for product in order.products %}
+	       {% set int = int + product.quantity %}
+	    {% endfor %}
+	    {% endif %}
+        <b>{{ int }}</b> {{ txt_total }}
+        </span>
+     </span>
+	    <br><span style="color: #1e91cf;"><i class="fa fa-truck fa-lg"></i> {{ order.shipping }}</span>
+	    {% if order.comment is not empty %}<br>
+            <div style="text-align: justify;color: #f24545;max-width: 345px;line-height: 15px;"><i class="fa fa-comment fa-lg"></i> {{ order.comment }}</div>
+	    {% endif %}
+
+    </td>
+			
+          <td>{{ order.status }}</td>
+          <td>{{ order.date_added }}</td>
+          <td class="text-right">{{ order.total }}</td>
+          <td class="text-right"><a href="{{ order.view }}" data-toggle="tooltip" title="{{ button_view }}" class="btn btn-info"><i class="fa fa-eye"></i></a></td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+          <td class="text-center" colspan="6">{{ text_no_results }}</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<style>
+.previeworder {
+  cursor: pointer;
+}
+
+.previeworder:hover {
+  font-weight: bold;
+}
+
+.previeworder > span:hover {
+  color: #5cb85c !important;
+}
+
+.text-left {
+  line-height: 27px !important;
+}
+
+.popover {
+  max-width: 700px;
+  width:700px;
+  max-height: 600px;
+  overflow-y: scroll;
+  top: 0;
+}
+ 
+@media screen and (max-width: 640px) {
+ .popover {
+ max-width: 300px;width:300px;
+ }
+}
+</style>
+
+<script type="text/javascript"><!--
+$('.previeworder').each(function () {
+    var $elem = $(this);
+
+    $elem.popover({
+        html: true,
+        sanitize: false,
+        container: $elem
+    });
+});
+//--></script>
+			

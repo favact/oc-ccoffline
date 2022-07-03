@@ -1,0 +1,115 @@
+<h2>{{ text_instruction }}</h2>
+<p><b>{{ text_description }}</b></p>
+<div class="well well-sm">
+  <p>{{ info }}</p>
+  <p>{{ text_payment }}</p>
+</div>
+
+<form id="payment" class="form-horizontal">
+  <fieldset>
+    <legend>{{ text_credit_card }}</legend>
+    <div class="form-group required">
+      <label class="col-sm-2 control-label" for="input-cc-owner">{{ entry_cc_owner }}</label>
+      <div class="col-sm-10">
+        <input type="text" name="cc_owner" value="" placeholder="{{ entry_cc_owner }}" id="input-cc-owner" class="form-control" />
+      </div>
+    </div>
+    <div class="form-group required">
+      <label class="col-sm-2 control-label" for="input-cc-number">{{ entry_cc_number }}</label>
+      <div class="col-sm-10">
+        <input type="text" name="cc_number" value="" placeholder="{{ entry_cc_number }}" id="input-cc-number" class="form-control" />
+      </div>
+    </div>
+    <div class="form-group required">
+      <label class="col-sm-2 control-label" for="input-cc-expire-date">{{ entry_cc_expire_date }}</label>
+      <div class="col-sm-3">
+        <select name="cc_expire_date_month" id="input-cc-expire-date" class="form-control">
+          
+         {% for month in months %}
+          
+          <option value="{{ month.value }}">{{ month.text }}</option>
+          
+          {% endfor %}
+        
+        </select>
+      </div>
+      <div class="col-sm-3">
+        <select name="cc_expire_date_year" id="input-cc-expire-date-year" class="form-control">
+          
+         {% for year in year_expire %}
+          
+          <option value="{{ year.value }}">{{ year.text }}</option>
+          
+          {% endfor %}
+        
+        </select>
+      </div>
+    </div>
+    <div class="form-group required">
+      <label class="col-sm-2 control-label" for="input-cc-cvv2">{{ entry_cc_cvv2 }}</label>
+      <div class="col-sm-10">
+        <input type="text" name="cc_cvv2" value="" placeholder="{{ entry_cc_cvv2 }}" id="input-cc-cvv2" class="form-control" />
+      </div>
+    </div>
+  </fieldset>
+</form>
+<div class="buttons">
+  <div class="pull-right">
+    <input type="button" value="{{ button_confirm }}" id="button-confirm" data-loading-text="{{ text_loading }}" class="btn btn-primary" />
+  </div>
+</div>
+
+
+<script type="text/javascript"><!--
+$('#button-confirm').on('click', function() {
+	$.ajax({
+		url: 'index.php?route=extension/payment/ccoffline/confirm',
+		dataType: 'json',
+		type: 'post',
+		data: $('#payment :input'),
+		cache: false,
+		beforeSend: function() {
+			$('#button-confirm').button('loading');
+		},
+		complete: function() {
+			$('#button-confirm').button('reset');
+		},
+		success: function(json) {
+      if (json['error']) {
+        $('#payment :input').closest('.form-group').removeClass('has-error');
+        $('div').remove('.text-danger');
+        //$('#input-cc-owner').closest('.form-group').removeClass('has-error');
+  			if (json['error']['cc_owner']) {
+          $('#input-cc-owner').after('<div class="text-danger">' + json['error']['cc_owner'] + '</div>');
+          $('#input-cc-owner').closest('.form-group').addClass('has-error');
+  				//alert(json['error']['cc_owner']);
+  			}
+
+        if (json['error']['cc_number']) {
+          $('#input-cc-number').after('<div class="text-danger">' + json['error']['cc_number'] + '</div>');
+          $('#input-cc-number').closest('.form-group').addClass('has-error');
+        }
+        if (json['error']['cc_expire_date_month']) {
+          $('#input-cc-expire-date').after('<div class="text-danger">' + json['error']['cc_expire_date_month'] + '</div>');
+          $('#input-cc-expire-date').closest('.form-group').addClass('has-error');
+        }
+        if (json['error']['cc_expire_date_year']) {
+          $('#input-cc-expire-date-year').after('<div class="text-danger">' + json['error']['cc_expire_date_year'] + '</div>');
+          $('#input-cc-expire-date-year').closest('.form-group').addClass('has-error');
+        }
+        if (json['error']['cc_cvv2']) {
+          $('#input-cc-cvv2').after('<div class="text-danger">' + json['error']['cc_cvv2'] + '</div>');
+          $('#input-cc-cvv2').closest('.form-group').addClass('has-error');
+        }
+      }
+
+			if (json['redirect']) {
+				location = json['redirect'];
+			}
+		},
+		//error: function(xhr, ajaxOptions, thrownError) {
+			//alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		//}
+	});
+});
+//--></script>
